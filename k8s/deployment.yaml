@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-s3-app
+  labels:
+    app: flask-s3
+spec:
+  replicas: 2 # Vamos subir 2 por segurança (Alta Disponibilidade)
+  selector:
+    matchLabels:
+      app: flask-s3
+  template:
+    metadata:
+      labels:
+        app: flask-s3
+    spec:
+      containers:
+      - name: flask-container
+        image: ghcr.io/amsatnaf/flask-s3-aws:latest # O Actions vai trocar o :latest pelo SHA 
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"

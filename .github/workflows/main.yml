@@ -1,0 +1,57 @@
+name: CI - Build and Push image (GHCR)
+
+on:
+  push:
+    branches: [ "main" ]
+    # O workflow sobe apenas se houver mudanca no codigo ou manifesto
+    paths:
+      - 'app.py'
+      - 'Dockerfile'
+      - 'k8s/**'
+      - '.github/workflows/main.yml'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: amsatnaf
+          # GITHUB_TOKEN e gerado automaticamente pelo Github
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          # Gera a tag :latest e uma tag unica com o ID do commit (SHA)
+          tags: |
+            ghcr.io/amsatnaf/flask-s3-aws:latest
+            ghcr.io/amsatnaf/flask-s3-aws:${{ github.sha }}
+
+      - name: Update Kubernetes Manifest
+        # Este passo so roda se o build der certo e for na branch main
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Caminho do arquivo que criamos na pasta k8s
+          FILE_PATH="k8s/deployment.yaml"
+          
+          # Altera a imagem no YAML para usar a nova tag gerada (SHA)
+          sed -i "s|image: ghcr.io/amsatnaf/flask-s3-aws:.*|image: ghcr.io/amsatnaf/flask-s3-aws:${{ github.sha }}|g" $FILE_PATH
+          
+          git add $FILE_PATH
+          git commit -m "chore(ci): update image tag to ${{ github.sha }}"
+          git push
