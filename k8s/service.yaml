@@ -9,4 +9,5 @@ spec:
     - protocol: TCP
       port: 80        # Porta que você vai acessar no navegador
       targetPort: 5000 # Porta que o Flask está ouvindo dentro do Pod
-  type: LoadBalancer  # No EKS, isso cria um Classic Load Balancer da AWS automaticamente
+  #type: LoadBalancer  # No EKS, isso cria um Classic Load Balancer da AWS automaticamente
+  type: ClusterIP

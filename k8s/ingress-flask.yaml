@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flask-s3-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # Esse rewrite garante que o Flask receba a rota limpa
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /flask
+        pathType: Prefix
+        backend:
+          service:
+            name: flask-s3-service
+            port:
+              number: 80
