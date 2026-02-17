@@ -2,15 +2,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: flask-s3-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1 # <--- O segredo está aqui
+  # Note que as annotations de rewrite sumiram!
 spec:
   ingressClassName: nginx
   rules:
-  - http:
+  - host: api-flask.54-81-241-46.sslip.io # Substitua pelo seu IP do sslip
+    http:
       paths:
-      - path: /flask/?(.*) # <--- Captura tudo que vem depois de /flask
-        pathType: ImplementationSpecific
+      - path: / # Agora o caminho volta a ser a raiz simples
+        pathType: Prefix
         backend:
           service:
             name: flask-s3-service
