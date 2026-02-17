@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: flask-container
-        image: ghcr.io/amsatnaf/flask-s3-aws:latest # O Actions vai trocar o :latest pelo SHA 
+        image: ghcr.io/amsatnaf/flask-s3-aws:6f1cadee7224e88bc3e2e106c93f8c42e3360ff5
         ports:
         - containerPort: 5000
         resources:
